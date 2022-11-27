@@ -15,4 +15,8 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DataManager.Abstractions\DataManager.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
