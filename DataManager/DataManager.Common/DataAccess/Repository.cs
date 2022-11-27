@@ -1,7 +1,6 @@
-﻿using DataManager.Common.Abstractions;
+﻿using DataManager.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 
 namespace DataManager.Common.DataAccess
 {

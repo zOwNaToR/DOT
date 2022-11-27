@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace DataManager.Common.Abstractions
+namespace DataManager.Abstractions
 {
     public interface IRepository<TEntity>: IDisposable where TEntity : class
     {
