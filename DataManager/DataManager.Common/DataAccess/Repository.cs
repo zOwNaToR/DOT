@@ -7,6 +7,7 @@ namespace DataManager.Common.DataAccess
 {
     public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
+        private bool _disposed = false;
         protected readonly AppDbContext context;
         protected readonly DbSet<TEntity> dbSet;
 
@@ -105,6 +106,25 @@ namespace DataManager.Common.DataAccess
         {
             dbSet.Attach(entityToUpdate);
             context.Entry(entityToUpdate).State = EntityState.Modified;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    context.Dispose();
+                }
+            }
+
+            _disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
