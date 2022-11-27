@@ -9,6 +9,8 @@ namespace DataManager.Common
     {
         public const string AUTH_SCHEMA_NAME = "Auth";
 
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -47,7 +49,7 @@ namespace DataManager.Common
                     .WithOne()
                     .HasForeignKey(rc => rc.RoleId)
                     .IsRequired();
-                
+
                 b.HasMany(e => e.UserRoles)
                     .WithOne()
                     .HasForeignKey(ur => ur.UserId)
