@@ -10,10 +10,10 @@ namespace DataManager.SqlServer
 {
     public static class ServiceExtensions
     {
-        public static void AddDataManagerSqlServer(this IServiceCollection services, IConfiguration configuration)
+        public static void AddDataManagerSqlServer(this IServiceCollection services, IConfiguration configuration, string connectionStringName)
         {
             services.AddDbContext<AppDbContext>(
-                options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                options => options.UseSqlServer(configuration.GetConnectionString(connectionString),
                 b => b.MigrationsAssembly("DataManager.Common"))
             );
 
