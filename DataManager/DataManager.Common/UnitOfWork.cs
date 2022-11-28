@@ -1,4 +1,7 @@
 ﻿using DataManager.Common.Abstractions;
+using DataManager.Common.Abstractions.Repositories;
+using DataManager.Common.DataAccess;
+using DataManager.Common.POCOs;
 
 namespace DataManager.Common
 {
@@ -7,9 +10,15 @@ namespace DataManager.Common
         private bool _disposed;
         private readonly AppDbContext _context;
 
+        public IRepository<User> UserRepository { get; init; }
+        public IRepository<Role> RoleRepository { get; init; }
+
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
+
+            UserRepository = new Repository<User>(_context);
+            RoleRepository = new Repository<Role>(_context);
         }
 
         public async Task<int> SaveAsync()

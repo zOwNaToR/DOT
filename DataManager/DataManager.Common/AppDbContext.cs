@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DataManager.Common.POCOs;
+using DataManager.Common.Abstractions;
 
 namespace DataManager.Common
 {
-    public class AppDbContext : IdentityDbContext<User, Role, Guid>
+    public class AppDbContext : IdentityDbContext<User, Role, Guid>, IEntity
     {
         public const string AUTH_SCHEMA_NAME = "Auth";
 

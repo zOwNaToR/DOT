@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DataManager.Common.Abstractions;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace DataManager.Common.POCOs
 {
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>, IEntity
     {
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";

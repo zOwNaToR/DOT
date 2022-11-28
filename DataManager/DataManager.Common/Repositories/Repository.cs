@@ -1,10 +1,11 @@
-﻿using DataManager.Common.Abstractions.Repositories;
+﻿using DataManager.Common.Abstractions;
+using DataManager.Common.Abstractions.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace DataManager.Common.DataAccess
 {
-    public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
         private bool _disposed = false;
         protected readonly AppDbContext context;
@@ -13,7 +14,7 @@ namespace DataManager.Common.DataAccess
         public Repository(AppDbContext context)
         {
             this.context = context;
-            this.dbSet = context.Set<TEntity>();
+            dbSet = context.Set<TEntity>();
         }
 
         public virtual IEnumerable<TEntity> Get(
