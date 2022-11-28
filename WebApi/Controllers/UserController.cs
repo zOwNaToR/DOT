@@ -1,6 +1,5 @@
-﻿using DataManager.Common.Abstractions;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Auth.DTOs;
+using DataManager.Common.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -45,6 +44,25 @@ namespace WebApi.Controllers
                 }
 
                 return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return Problem(detail: e.Message, statusCode: (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostAsync([FromBody] RegisterUserRequest request)
+        {
+            try
+            {
+                var result = await _unitOfWork.UserRepository.InsertAsync(request.MapToPoco());
+                if (result is null)
+                {
+                    return BadRequest();
+                }
+
+                return Created($"api/{result.Id}", result);
             }
             catch (Exception e)
             {

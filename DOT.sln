@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataManager.SqlServer", "Da
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{4A04733A-8C4A-4CC9-8B8B-832910C18418}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth", "Auth\Auth\Auth.csproj", "{177A1D1C-A331-45E4-A7A7-FA1D87170565}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{4A04733A-8C4A-4CC9-8B8B-832910C18418}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A04733A-8C4A-4CC9-8B8B-832910C18418}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A04733A-8C4A-4CC9-8B8B-832910C18418}.Release|Any CPU.Build.0 = Release|Any CPU
+		{177A1D1C-A331-45E4-A7A7-FA1D87170565}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{177A1D1C-A331-45E4-A7A7-FA1D87170565}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{177A1D1C-A331-45E4-A7A7-FA1D87170565}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{177A1D1C-A331-45E4-A7A7-FA1D87170565}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

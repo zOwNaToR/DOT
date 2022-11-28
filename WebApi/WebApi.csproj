@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Auth\Auth\Auth.csproj" />
     <ProjectReference Include="..\DataManager\DataManager.SqlServer\DataManager.SqlServer.csproj" />
   </ItemGroup>
 
