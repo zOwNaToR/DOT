@@ -1,5 +1,5 @@
-﻿using DataManager.Abstractions;
-using DataManager.Common;
+﻿using DataManager.Common;
+using DataManager.Common.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +12,7 @@ namespace DataManager.SqlServer
         public static void AddDataManagerSqlServer(this IServiceCollection services, IConfiguration configuration, string connectionStringName)
         {
             services.AddDbContext<AppDbContext>(
-                options => options.UseSqlServer(configuration.GetConnectionString(connectionString),
+                options => options.UseSqlServer(configuration.GetConnectionString(connectionStringName),
                 b => b.MigrationsAssembly("DataManager.Common"))
             );
 

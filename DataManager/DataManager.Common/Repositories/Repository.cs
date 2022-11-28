@@ -1,4 +1,4 @@
-﻿using DataManager.Abstractions;
+﻿using DataManager.Common.Abstractions.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
