@@ -16,8 +16,8 @@ namespace DataManager.Common.Abstractions.Repositories
         TEntity? GetById(object id);
         Task<TEntity?> GetByIdAsync(object id);
 
-        void Insert(TEntity entity);
-        Task InsertAsync(TEntity entity);
+        TEntity? Insert(TEntity entity);
+        Task<TEntity?> InsertAsync(TEntity entity);
 
         void Delete(object id);
         Task DeleteAsync(object id);

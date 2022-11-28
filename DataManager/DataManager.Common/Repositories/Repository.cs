@@ -69,8 +69,18 @@ namespace DataManager.Common.DataAccess
         public virtual TEntity? GetById(object id) => dbSet.Find(id);
         public virtual async Task<TEntity?> GetByIdAsync(object id) => await dbSet.FindAsync(id);
 
-        public virtual void Insert(TEntity entity) => dbSet.Add(entity);
-        public virtual async Task InsertAsync(TEntity entity) => await dbSet.AddAsync(entity);
+        public virtual TEntity? Insert(TEntity entity)
+        {
+            var tracking = dbSet.Add(entity);
+
+            return tracking?.Entity;
+        }
+        public virtual async Task<TEntity?> InsertAsync(TEntity entity)
+        {
+            var tracking = await dbSet.AddAsync(entity);
+
+            return tracking?.Entity;
+        }
 
         public virtual void Delete(object id)
         {
