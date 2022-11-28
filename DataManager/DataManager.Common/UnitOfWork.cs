@@ -1,6 +1,6 @@
 ﻿using DataManager.Abstractions;
 
-namespace DataManager.Common.DataAccess
+namespace DataManager.Common
 {
     public class UnitOfWork : IUnitOfWork
     {

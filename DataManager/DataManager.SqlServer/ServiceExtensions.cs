@@ -1,6 +1,5 @@
 ﻿using DataManager.Abstractions;
 using DataManager.Common;
-using DataManager.Common.DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
