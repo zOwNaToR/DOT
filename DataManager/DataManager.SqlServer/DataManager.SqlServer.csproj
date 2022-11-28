@@ -16,4 +16,8 @@
     <ProjectReference Include="..\DataManager.Common\DataManager.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

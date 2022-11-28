@@ -13,7 +13,7 @@ namespace DataManager.SqlServer
         {
             services.AddDbContext<AppDbContext>(
                 options => options.UseSqlServer(configuration.GetConnectionString(connectionStringName),
-                b => b.MigrationsAssembly("DataManager.Common"))
+                b => b.MigrationsAssembly("DataManager.SqlServer"))
             );
 
             services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>()

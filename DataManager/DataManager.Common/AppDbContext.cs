@@ -54,7 +54,7 @@ namespace DataManager.Common
                 b.Property(r => r.ConcurrencyStamp).IsConcurrencyToken();
 
                 b.HasMany(e => e.RoleClaims).WithOne().HasForeignKey(rc => rc.RoleId).IsRequired();
-                b.HasMany(e => e.UserRoles).WithOne().HasForeignKey(ur => ur.UserId).IsRequired();
+                b.HasMany(e => e.UserRoles).WithOne().HasForeignKey(ur => ur.RoleId).IsRequired();
             });
 
             builder.Entity<IdentityUserRole<Guid>>(b =>
@@ -78,7 +78,7 @@ namespace DataManager.Common
             builder.Entity<IdentityUserLogin<Guid>>(b =>
             {
                 b.HasKey(l => new { l.LoginProvider, l.ProviderKey });
-                b.ToTable("UserLogins");
+                b.ToTable("UserLogins", AUTH_SCHEMA_NAME);
 
                 b.Property(l => l.LoginProvider).HasMaxLength(128);
                 b.Property(l => l.ProviderKey).HasMaxLength(128);
@@ -87,7 +87,7 @@ namespace DataManager.Common
             builder.Entity<IdentityUserToken<Guid>>(b =>
             {
                 b.HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
-                b.ToTable("UserTokens");
+                b.ToTable("UserTokens", AUTH_SCHEMA_NAME);
 
                 b.Property(t => t.LoginProvider).HasMaxLength(512);
                 b.Property(t => t.Name).HasMaxLength(512);
