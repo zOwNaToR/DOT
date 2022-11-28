@@ -6,10 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Auth.DTOs
+namespace Auth.DTOs.Requests
 {
     public class RegisterUserRequest
     {
+        public Guid Id { get; init; } = Guid.NewGuid();
+
         [Required(ErrorMessage = "UserName required")]
         public string UserName { get; set; } = "";
 
@@ -36,6 +38,7 @@ namespace Auth.DTOs
         {
             return new User
             {
+                Id = Id,
                 UserName = UserName,
                 FirstName = FirstName,
                 LastName = LastName,

@@ -1,4 +1,5 @@
-﻿using Auth.DTOs;
+﻿using Auth.Abstractions;
+using Auth.DTOs.Requests;
 using DataManager.Common.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -10,10 +11,12 @@ namespace WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuthenticationService _authenticationService;
 
-        public UserController(IUnitOfWork unitOfWork)
+        public UserController(IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
         {
             _unitOfWork = unitOfWork;
+            _authenticationService = authenticationService;
         }
 
         [HttpGet]
@@ -56,13 +59,13 @@ namespace WebApi.Controllers
         {
             try
             {
-                var result = await _unitOfWork.UserRepository.InsertAsync(request.MapToPoco());
-                if (result is null)
+                var result = await _authenticationService.RegisterAsync(request);
+                if (!result.Success)
                 {
                     return BadRequest();
                 }
 
-                return Created($"api/{result.Id}", result);
+                return Created($"api/{request.Id}", result);
             }
             catch (Exception e)
             {
