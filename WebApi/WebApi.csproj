@@ -17,8 +17,4 @@
     <ProjectReference Include="..\DataManager\DataManager.SqlServer\DataManager.SqlServer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
