@@ -1,4 +1,4 @@
-﻿using DataManager.Abstractions;
+﻿using DataManager.Common.Abstractions;
 
 namespace DataManager.Common
 {

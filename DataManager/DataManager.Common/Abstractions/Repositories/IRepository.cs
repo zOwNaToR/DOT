@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
 
-namespace DataManager.Abstractions
+namespace DataManager.Common.Abstractions.Repositories
 {
-    public interface IRepository<TEntity>: IDisposable where TEntity : class
+    public interface IRepository<TEntity> : IDisposable where TEntity : class
     {
         IEnumerable<TEntity> Get(
             Expression<Func<TEntity, bool>>? filter = null,
