@@ -17,7 +17,34 @@ namespace DataManager.Common.DataAccess
             dbSet = context.Set<TEntity>();
         }
 
-        public virtual IEnumerable<TEntity> Get(
+        public virtual TEntity? Get(
+            Expression<Func<TEntity, bool>> filter,
+            string includeProperties = "")
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            foreach (var includeProperty in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return query.FirstOrDefault(filter);
+        }
+        public virtual async Task<TEntity?> GetAsync(
+            Expression<Func<TEntity, bool>> filter,
+            string includeProperties = "")
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            foreach (var includeProperty in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync(filter);
+        }
+
+        public virtual IEnumerable<TEntity> Search(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "")
@@ -41,7 +68,7 @@ namespace DataManager.Common.DataAccess
 
             return query.ToList();
         }
-        public virtual async Task<IEnumerable<TEntity>> GetAsync(
+        public virtual async Task<IEnumerable<TEntity>> SearchAsync(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "")
