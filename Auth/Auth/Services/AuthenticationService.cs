@@ -20,7 +20,7 @@ namespace Auth.Services
         private readonly SignInManager<User> _signInManager;
         private readonly HttpContext _httpContext;
         private readonly IEmailSender _emailSender;
-        private readonly ITokenService _tokerService;
+        private readonly ITokenService _tokenService;
         private readonly IUnitOfWork _unitOfWork;
 
         public AuthenticationService(UserManager<User> userManager,
@@ -35,7 +35,7 @@ namespace Auth.Services
             _signInManager = signInManager;
             _httpContext = httpContextAccessor!.HttpContext!;
             _emailSender = emailSender;
-            _tokerService = tokerService;
+            _tokenService = tokerService;
             _unitOfWork = unitOfWork;
         }
 
@@ -141,11 +141,52 @@ namespace Auth.Services
             return new AuthenticationResponse(true);
         }
 
+        public async Task<AuthenticationResponse> RefreshTokenAsync(string token, Guid refreshToken)
+        {
+            var errorResponse = new AuthenticationResponse();
+
+            if (!string.IsNullOrEmpty(token) && !_tokenService.IsJwtTokenValid(token))
+            {
+                errorResponse.Errors.Add("Invalid token");
+                return errorResponse;
+            }
+
+            var dbRefreshToken = await _unitOfWork.RefreshTokenRepository.GetAsync(x => x.Id == refreshToken);
+            if (dbRefreshToken == null)
+            {
+                errorResponse.Errors.Add("Refresh token not found");
+                return errorResponse;
+            }
+            if (dbRefreshToken.Invalidated)
+            {
+                await InvalidateAllUserRefreshTokensAsync(dbRefreshToken.UserId);
+
+                errorResponse.Errors.Add("Refresh token has been invalidated");
+                return errorResponse;
+            }
+            if (dbRefreshToken.ExpireDate < DateTime.UtcNow)
+            {
+                errorResponse.Errors.Add("Refresh token expired");
+                return errorResponse;
+            }
+            if (dbRefreshToken.Used)
+            {
+                errorResponse.Errors.Add("Refresh token has been used");
+                return errorResponse;
+            }
+
+            dbRefreshToken.Used = true;
+            await _unitOfWork.SaveAsync();
+
+            var user = await _userManager.FindByIdAsync(dbRefreshToken.UserId.ToString());
+            return await AuthenticateUser(user);
+        }
+
         private async Task<AuthenticationResponse> AuthenticateUser(User user)
         {
-            var claims = await _tokerService.GetUserClaimsAsync(user);
-            var jwtToken = _tokerService.GenerateJwtToken(claims);
-            var refreshToken = await _tokerService.GenerateRefreshTokenAsync(user.Id, jwtToken.Id);
+            var claims = await _tokenService.GetUserClaimsAsync(user);
+            var jwtToken = _tokenService.GenerateJwtToken(claims);
+            var refreshToken = await _tokenService.GenerateRefreshTokenAsync(user.Id, jwtToken.Id);
 
             if (refreshToken is null)
             {
@@ -161,6 +202,17 @@ namespace Auth.Services
                 UserName = user.UserName,
                 Roles = claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList(),
             };
+        }
+
+        private async Task InvalidateAllUserRefreshTokensAsync(Guid userId)
+        {
+            var dbRefreshTokens = await _unitOfWork.RefreshTokenRepository.SearchAsync(x => x.UserId == userId && !x.Invalidated);
+            foreach (var dbRefreshToken in dbRefreshTokens)
+            {
+                dbRefreshToken.Invalidated = true;
+            }
+
+            await _unitOfWork.SaveAsync();
         }
     }
 }

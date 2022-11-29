@@ -14,5 +14,7 @@ namespace Auth.Abstractions
         Task<IEnumerable<Claim>> GetUserClaimsAsync(User user);
         JwtToken GenerateJwtToken(IEnumerable<Claim> claims);
         Task<RefreshToken?> GenerateRefreshTokenAsync(Guid UserId, string JwtTokenId);
+        ClaimsPrincipal? GetPrincipalFromJwtToken(string token);
+        bool IsJwtTokenValid(string token);
     }
 }

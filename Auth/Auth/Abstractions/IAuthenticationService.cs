@@ -9,7 +9,7 @@ namespace Auth.Abstractions
         Task<BaseResponse> ConfirmEmailAsync(Guid userId, string confirmEmailToken);
         Task<AuthenticationResponse> LoginAsync(string email, string password);
         Task<AuthenticationResponse> RevokeRefreshTokenAsync(Guid refreshTtoken);
-        //Task<AuthenticationResponse> RefreshTokenAsync(string token, string refreshToken);
+        Task<AuthenticationResponse> RefreshTokenAsync(string token, Guid refreshToken);
         //Task<SendResetPasswordLinkResponse> SendPasswordResetLinkAsync(string email);
         //Task<BaseResponse> ResetPasswordAsync(Guid userId, string password, string resetPasswordToken);
     }

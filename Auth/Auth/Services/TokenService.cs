@@ -19,17 +19,20 @@ namespace Auth.Services
         private readonly RoleManager<Role> _roleManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly TokenConfig _tokenConfig;
+        private readonly TokenValidationParameters _tokenValidationParameters;
 
         public TokenService(UserManager<User> userManager,
             RoleManager<Role> roleManager,
             IUnitOfWork unitOfWork,
-            IOptions<TokenConfig> tokenConfig
+            IOptions<TokenConfig> tokenConfig,
+            TokenValidationParameters tokenValidationParameters
         )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _unitOfWork = unitOfWork;
             _tokenConfig = tokenConfig.Value;
+            _tokenValidationParameters = tokenValidationParameters;
         }
 
         public async Task<IEnumerable<Claim>> GetUserClaimsAsync(User user)
@@ -103,6 +106,54 @@ namespace Auth.Services
             await _unitOfWork.SaveAsync();
 
             return refreshToken;
+        }
+
+        public bool IsJwtTokenValid(string token)
+        {
+            var validatedToken = GetPrincipalFromJwtToken(token);
+            if (validatedToken is null)
+            {
+                return false;
+            }
+
+            var expiryDateUnix = long.Parse(validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+            var expiryDateTimeUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(expiryDateUnix);
+            
+            if (expiryDateTimeUtc > DateTime.UtcNow)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public ClaimsPrincipal? GetPrincipalFromJwtToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var tokenValidationParameters = _tokenValidationParameters.Clone();
+                tokenValidationParameters.ValidateLifetime = false;
+
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var validatedToken);
+                if (!IsJwtAndValidAlgorithm(validatedToken))
+                {
+                    return null;
+                }
+
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static bool IsJwtAndValidAlgorithm(SecurityToken token)
+        {
+            return (token is JwtSecurityToken jwtToken) &&
+                jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
