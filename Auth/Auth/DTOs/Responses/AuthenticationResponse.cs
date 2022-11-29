@@ -3,7 +3,7 @@
     public class AuthenticationResponse : BaseResponse
     {
         public string Token { get; set; } = "";
-        public string RefreshToken { get; set; } = "";
+        public Guid RefreshToken { get; set; }
         public DateTime ExpireDate { get; set; }
         public bool RefreshTokenHidden { get; set; }
 
@@ -16,7 +16,7 @@
 
         public void HideRefreshToken()
         {
-            RefreshToken = "";
+            RefreshToken = Guid.Empty;
             RefreshTokenHidden = true;
         }
 
