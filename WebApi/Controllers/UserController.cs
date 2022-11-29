@@ -24,7 +24,7 @@ namespace WebApi.Controllers
         {
             try
             {
-                var result = await _unitOfWork.UserRepository.GetAsync();
+                var result = await _unitOfWork.UserRepository.SearchAsync();
 
                 return Ok(result);
             }
