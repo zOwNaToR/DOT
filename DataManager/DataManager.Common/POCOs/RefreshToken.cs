@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using DataManager.Common.Abstractions;
 
 namespace DataManager.Common.POCOs
 {
-    public class RefreshToken
+    public class RefreshToken : IEntity
     {
         public Guid Id { get; set; }
         public string JwtId { get; set; } = "";

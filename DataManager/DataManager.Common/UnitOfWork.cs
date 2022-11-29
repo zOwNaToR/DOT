@@ -12,6 +12,7 @@ namespace DataManager.Common
 
         public IRepository<User> UserRepository { get; init; }
         public IRepository<Role> RoleRepository { get; init; }
+        public IRepository<RefreshToken> RefreshTokenRepository { get; init; }
 
         public UnitOfWork(AppDbContext context)
         {
@@ -19,6 +20,7 @@ namespace DataManager.Common
 
             UserRepository = new Repository<User>(_context);
             RoleRepository = new Repository<Role>(_context);
+            RefreshTokenRepository = new Repository<RefreshToken>(_context);
         }
 
         public async Task<int> SaveAsync()

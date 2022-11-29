@@ -1,11 +1,14 @@
 ﻿using Auth.Abstractions;
 using Auth.DTOs.Requests;
 using Auth.DTOs.Responses;
+using DataManager.Common.Abstractions;
 using DataManager.Common.POCOs;
 using Email.Abstractions;
 using Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using System.Security.Claims;
 
@@ -18,12 +21,14 @@ namespace Auth.Services
         private readonly HttpContext _httpContext;
         private readonly IEmailSender _emailSender;
         private readonly ITokenService _tokerService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AuthenticationService(UserManager<User> userManager,
             SignInManager<User> signInManager,
             IHttpContextAccessor httpContextAccessor,
             IEmailSender emailSender,
-            ITokenService tokerService
+            ITokenService tokerService,
+            IUnitOfWork unitOfWork
         )
         {
             _userManager = userManager;
@@ -31,6 +36,7 @@ namespace Auth.Services
             _httpContext = httpContextAccessor!.HttpContext!;
             _emailSender = emailSender;
             _tokerService = tokerService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<BaseResponse> RegisterAsync(RegisterUserRequest request)
@@ -88,6 +94,51 @@ namespace Auth.Services
             }
 
             return await AuthenticateUser(user);
+        }
+
+        public async Task<BaseResponse> ConfirmEmailAsync(Guid userId, string confirmEmailToken)
+        {
+            var response = new BaseResponse();
+
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                response.Errors.Add("User not found");
+                return response;
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, confirmEmailToken);
+            if (!result.Succeeded)
+            {
+                response.Errors.AddRange(result.Errors.Select(x => x.Description));
+                return response;
+            }
+
+            await _emailSender.SendAsync("", user.Email, "Email confirmed .NET Auth", $"Your email has been confirmed.");
+
+            return new BaseResponse(true);
+        }
+
+        public async Task<AuthenticationResponse> RevokeRefreshTokenAsync(Guid refreshToken)
+        {
+            var errorResponse = new AuthenticationResponse();
+
+            var dbRefreshToken = await _unitOfWork.RefreshTokenRepository.GetAsync(x => x.Id == refreshToken);
+            if (dbRefreshToken == null)
+            {
+                errorResponse.Errors.Add("Refresh token not found");
+                return errorResponse;
+            }
+            if (dbRefreshToken.Invalidated)
+            {
+                errorResponse.Errors.Add("Refresh token is not active");
+                return errorResponse;
+            }
+
+            dbRefreshToken.Invalidated = true;
+            await _unitOfWork.SaveAsync();
+
+            return new AuthenticationResponse(true);
         }
 
         private async Task<AuthenticationResponse> AuthenticateUser(User user)

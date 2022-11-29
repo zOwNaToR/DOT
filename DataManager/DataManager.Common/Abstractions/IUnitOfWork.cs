@@ -7,6 +7,7 @@ namespace DataManager.Common.Abstractions
     {
         IRepository<User> UserRepository { get; }
         IRepository<Role> RoleRepository { get; }
+        IRepository<RefreshToken> RefreshTokenRepository { get; }
 
         Task<int> SaveAsync();
     }
