@@ -13,5 +13,6 @@ namespace DataManager.Common.POCOs
 
         public virtual ICollection<IdentityUserClaim<Guid>> Claims { get; set; }
         public virtual ICollection<IdentityUserRole<Guid>> UserRoles { get; set; }
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }

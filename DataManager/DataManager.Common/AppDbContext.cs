@@ -24,6 +24,7 @@ namespace DataManager.Common
             builder.Entity<User>(b =>
             {
                 b.HasKey(u => u.Id);
+                b.Property(u => u.Id).ValueGeneratedOnAdd();
                 b.ToTable("Users", AUTH_SCHEMA_NAME);
 
                 b.HasIndex(u => u.NormalizedUserName).HasDatabaseName("UserNameIndex").IsUnique();
@@ -37,24 +38,28 @@ namespace DataManager.Common
                 b.Property(e => e.BirthDate).IsRequired();
                 b.Property(u => u.ConcurrencyStamp).IsConcurrencyToken();
 
-                b.HasMany(e => e.Claims).WithOne().HasForeignKey(uc => uc.UserId).IsRequired();
-                b.HasMany(e => e.UserRoles).WithOne().HasForeignKey(ur => ur.UserId).IsRequired();
+                b.HasMany(r => r.Claims).WithOne().HasForeignKey(uc => uc.UserId).IsRequired();
+                b.HasMany(u => u.UserRoles).WithOne().HasForeignKey(ur => ur.UserId).IsRequired();
                 b.HasMany<IdentityUserLogin<Guid>>().WithOne().HasForeignKey(ul => ul.UserId).IsRequired();
                 b.HasMany<IdentityUserToken<Guid>>().WithOne().HasForeignKey(ut => ut.UserId).IsRequired();
+
+                b.HasMany(u => u.RefreshTokens).WithOne().HasForeignKey(rt => rt.UserId).IsRequired();
             });
 
             builder.Entity<Role>(b =>
             {
                 b.HasKey(r => r.Id);
-                b.HasIndex(r => r.NormalizedName).HasDatabaseName("RoleNameIndex").IsUnique();
+                b.Property(r => r.Id).ValueGeneratedOnAdd();
                 b.ToTable("Roles", AUTH_SCHEMA_NAME);
 
-                b.Property(u => u.Name).HasMaxLength(256).IsRequired();
-                b.Property(u => u.NormalizedName).HasMaxLength(256).IsRequired();
+                b.HasIndex(r => r.NormalizedName).HasDatabaseName("RoleNameIndex").IsUnique();
+
+                b.Property(r => r.Name).HasMaxLength(256).IsRequired();
+                b.Property(r => r.NormalizedName).HasMaxLength(256).IsRequired();
                 b.Property(r => r.ConcurrencyStamp).IsConcurrencyToken();
 
-                b.HasMany(e => e.RoleClaims).WithOne().HasForeignKey(rc => rc.RoleId).IsRequired();
-                b.HasMany(e => e.UserRoles).WithOne().HasForeignKey(ur => ur.RoleId).IsRequired();
+                b.HasMany(r => r.RoleClaims).WithOne().HasForeignKey(rc => rc.RoleId).IsRequired();
+                b.HasMany(r => r.UserRoles).WithOne().HasForeignKey(ur => ur.RoleId).IsRequired();
             });
 
             builder.Entity<IdentityUserRole<Guid>>(b =>
@@ -65,13 +70,15 @@ namespace DataManager.Common
 
             builder.Entity<IdentityUserClaim<Guid>>(b =>
             {
-                b.HasKey(rc => rc.Id);
+                b.HasKey(uc => uc.Id);
+                b.Property(uc => uc.Id).ValueGeneratedOnAdd();
                 b.ToTable("UserClaims", AUTH_SCHEMA_NAME);
             });
 
             builder.Entity<IdentityRoleClaim<Guid>>(b =>
             {
                 b.HasKey(rc => rc.Id);
+                b.Property(rc => rc.Id).ValueGeneratedOnAdd();
                 b.ToTable("RoleClaims", AUTH_SCHEMA_NAME);
             });
 
@@ -91,6 +98,13 @@ namespace DataManager.Common
 
                 b.Property(t => t.LoginProvider).HasMaxLength(512);
                 b.Property(t => t.Name).HasMaxLength(512);
+            });
+
+            builder.Entity<RefreshToken>(b =>
+            {
+                b.HasKey(rt => rt.Id);
+                b.Property(rt => rt.Id).ValueGeneratedOnAdd();
+                b.ToTable("RefreshTokens", AUTH_SCHEMA_NAME);
             });
         }
     }
