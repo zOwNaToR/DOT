@@ -1,18 +1,17 @@
 ﻿using Email.Abstractions;
+using Email.DTOs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Email
 {
     public static class ServiceExtensions
     {
-        public static void AddDataManagerSqlServer(this IServiceCollection services,
-            string defaultFrom,
-            string defaultPassword,
-            string host,
-            int port
-        )
+        public static void AddEmailSender(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IEmailSender, EmailSender>(x => new EmailSender(defaultFrom, defaultPassword, host, port));
+            services.Configure<EmailConfig>(configuration.GetSection("Email"));
+
+            services.AddScoped<IEmailSender, EmailSender>();
         }
     }
 }

@@ -5,6 +5,7 @@ using DataManager.Common;
 using DataManager.Common.Abstractions;
 using DataManager.Common.POCOs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,30 +18,18 @@ namespace Auth.Services
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly int _tokenExpiresIn;
-        private readonly int _refreshTokenExpiresIn;
-        private readonly string _audience;
-        private readonly string _issuer;
-        private readonly string _secretKey;
+        private readonly TokenConfig _tokenConfig;
 
         public TokenService(UserManager<User> userManager,
             RoleManager<Role> roleManager,
             IUnitOfWork unitOfWork,
-            int tokenExpiresIn,
-            int refreshTokenExpiresIn,
-            string audience,
-            string issuer,
-            string secretKey
+            IOptions<TokenConfig> tokenConfig
         )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _unitOfWork = unitOfWork;
-            _tokenExpiresIn = tokenExpiresIn;
-            _refreshTokenExpiresIn = refreshTokenExpiresIn;
-            _audience = audience;
-            _issuer = issuer;
-            _secretKey = secretKey;
+            _tokenConfig = tokenConfig.Value;
         }
 
         public async Task<IEnumerable<Claim>> GetUserClaimsAsync(User user)
@@ -78,15 +67,15 @@ namespace Auth.Services
         public JwtToken GenerateJwtToken(IEnumerable<Claim> claims)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenConfig.SecretKey));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(_tokenExpiresIn),
+                Expires = DateTime.UtcNow.AddMinutes(_tokenConfig.TokenExpiresIn),
                 SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256),
-                Audience = _audience,
-                Issuer = _issuer
+                Audience = _tokenConfig.Audience,
+                Issuer = _tokenConfig.Issuer
             };
 
             var securityToken = tokenHandler.CreateToken(tokenDescriptor);
@@ -101,7 +90,7 @@ namespace Auth.Services
             if (user is null) return null;
             
             var utcNow = DateTime.UtcNow;
-            var expireDateRefreshToken = utcNow.AddDays(_refreshTokenExpiresIn);
+            var expireDateRefreshToken = utcNow.AddDays(_tokenConfig.RefreshTokenExpiresIn);
             var refreshToken = new RefreshToken()
             {
                 JwtId = JwtTokenId,

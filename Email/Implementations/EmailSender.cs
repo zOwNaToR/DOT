@@ -1,27 +1,24 @@
 ﻿using Email.Abstractions;
 using System.Net.Mail;
 using System.Net;
+using Microsoft.Extensions.Options;
+using Email.DTOs;
 
 namespace Email
 {
     public class EmailSender : IEmailSender
     {
-        private readonly string _defaultFrom;
-        private readonly string _defaultPassword;
-        private readonly string _host;
-        private readonly int _port;
+        private readonly EmailConfig _emailConfig;
 
-        public EmailSender(string defaultFrom, string defaultPassword, string host, int port)
+        public EmailSender(IOptions<EmailConfig> emailConfig)
         {
-            _defaultFrom = defaultFrom;
-            _defaultPassword = defaultPassword;
-            _host = host;
-            _port = port;
+            _emailConfig = emailConfig.Value;
         }
 
         public async Task SendAsync(string from, string to, string subject, string html)
         {
-            var fromAddress = new MailAddress(string.IsNullOrEmpty(from) ? _defaultFrom : from, ".NET Auth");
+            var actualFrom = string.IsNullOrEmpty(from) ? _emailConfig.DefaultFrom : from;
+            var fromAddress = new MailAddress(actualFrom, ".NET Auth");
             var toAddress = new MailAddress(to, to);
 
             using var email = new MailMessage(fromAddress, toAddress)
@@ -35,7 +32,8 @@ namespace Email
         }
         public async Task SendAsync(string from, IEnumerable<string> to, string subject, string html)
         {
-            var fromAddress = new MailAddress(string.IsNullOrEmpty(from) ? _defaultFrom : from, ".NET Auth");
+            var actualFrom = string.IsNullOrEmpty(from) ? _emailConfig.DefaultFrom : from;
+            var fromAddress = new MailAddress(actualFrom, ".NET Auth");
 
             using var email = new MailMessage()
             {
@@ -57,11 +55,15 @@ namespace Email
         {
             try
             {
-                using var smtp = new SmtpClient(_host, _port)
+                var credentials = !string.IsNullOrEmpty(_emailConfig.DefaultPassword)
+                    ? new NetworkCredential(email.From?.Address, _emailConfig.DefaultPassword)
+                    : null;
+
+                using var smtp = new SmtpClient(_emailConfig.Host, _emailConfig.Port)
                 {
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
-                    Credentials = new NetworkCredential(email.From?.Address, _defaultPassword),
+                    Credentials = credentials,
                     Timeout = 20000,
                 };
 

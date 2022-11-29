@@ -20,6 +20,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Auth\Auth\Auth.csproj" />
     <ProjectReference Include="..\DataManager\DataManager.SqlServer\DataManager.SqlServer.csproj" />
+    <ProjectReference Include="..\Email\Email.csproj" />
+    <ProjectReference Include="..\Extensions\Extensions.csproj" />
   </ItemGroup>
 
 </Project>
